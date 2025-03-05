@@ -86,7 +86,6 @@ userSchema.methods.generateAccessToken = function () {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
     }
   );
-  
 };
 
 //! Methods for creating Refresh Token isme information km hoti hai
