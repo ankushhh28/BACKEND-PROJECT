@@ -53,7 +53,7 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-//! Encrypting the password...
+//! Encrypting the password through mongoose middlewares(hooks)...
 userSchema.pre("save", async function (next) {
   //* agr password modified nhi hai to next kr do
   if (!this.isModified("password")) next();
@@ -64,15 +64,17 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-//! creating fn for comparing the password with the hashed password stored in the DB
+//! creating custom fn for comparing the password with the hashed password stored in the DB
 userSchema.methods.isPasswordCorrect = async function (password) {
   //* bcrypt.compare() function hashed password ko decrypt nahi karta,Balki yeh plain password ka hash generate karke database wale hash se compare karta hai
   return await bcrypt.compare(password, this.password);
 };
 
+//~ jwt: jwt ek bearer token hai mtlb jo usko bear krta hai hm usko data bhej denge
+// ~ refreshtokens snd accesstokens dono hi jwt token hai but usage ka difference hai
 //! Methods for creating Access Token
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -86,9 +88,9 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-//! Methods for creating Refresh Token
+//! Methods for creating Refresh Token isme information km hoti hai
 userSchema.methods.generateRefreshToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
     },
