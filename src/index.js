@@ -1,7 +1,7 @@
 import "dotenv/config";
 //! no need to give path in dotenv as it is in the root directory
 import connectDB from "./db/index.js";
-import app from "./app.js";
+import { app } from "./app.js";
 
 //! Database imported....
 connectDB()

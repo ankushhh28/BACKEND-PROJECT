@@ -18,8 +18,8 @@ const asyncHandler = (fn) => async (re, res, next) => {
 //! II approach: using Promises...
 /*
 const asyncHandler = (requestHandler) => {
-  (req, res, next) => {
-    Promise
+  (req, res, next) => {  
+    Promise  
     .resolve(requestHandler(req, res, next))
     .catch((error)=>next(error));
     //* next(error) ka use karke error ko Express ke error-handling middleware tak bhej diya jata hai.Matlab hume har function me manually try-catch likhne ki zaroorat nahi hai 
