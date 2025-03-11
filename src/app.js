@@ -21,17 +21,17 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 //* Yeh middleware URL-encoded data ko parse karta hai
 //* extended: true → Yeh batata hai ki nested objects aur arrays ko support karna hai ya nahi
 
-app.use(express.static);
+app.use(express.static("public"));
 //* refer notes....
 
-app.use(cookieParser());
+// app.use(cookieParser());
 //* refer notes....
 
 //! routes importing......
-import userRouter from "./routes/user.routes.js";
+import router from "./routes/user.routes.js";
 
 //! routes declaration...
-//* url format=> https://localhost:5000/users/route_name
-app.use("/api/v1/users", userRouter);
+//* url format=> https://localhost:8000/api/v1/users/route_name
+app.use("/api/v1/users", router);
 
 export { app };
