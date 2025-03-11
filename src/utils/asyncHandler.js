@@ -4,7 +4,7 @@
 //~it is a higher order fn as it returns another function is similar as
 //~ ()=>{async ()=>{}}
 
-const asyncHandler = (fn) => async (re, res, next) => {
+const asyncHandler = (fn) => async (req, res, next) => {
   try {
     await fn(req, res, next);
   } catch (error) {

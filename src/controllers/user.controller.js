@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
   // validation- not empty
@@ -15,16 +16,19 @@ const registerUser = asyncHandler(async (req, res) => {
   // return response
 
   const { username, email, fullName, password } = req.body;
+
   //~ check all fields are filled or not
   if (
     [fullName, username, email, password].some((field) => field?.trim() === "")
   ) {
     throw new ApiError(400, "All fields are required!");
   }
+
   //~ check already user exist or not
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
+
   if (existedUser) {
     throw new ApiError(409, "User with email or username already exists!");
   }
@@ -36,9 +40,19 @@ const registerUser = asyncHandler(async (req, res) => {
   //~ ✅ Agar req.files.avatar ya avatar[0] exist nahi karta, toh undefined return hoga.
   //~ ✅ Optional Chaining (?.) ka use kiya gaya hai taaki agar koi value undefined ho toh error na aaye.
   //* ye req.files multer ka method hai multer ko as a middleware lagaya hai isiliye ise hm use kr skte hai
+  console.log(req.files);
 
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.avatar[0]?.path;
+  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
+
+  let coverImageLocalPath;
+  if (
+    req.files &&
+    Array.isArray(req.files.coverImage) &&
+    req.files.coverImage.length > 0
+  ) {
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required!");
@@ -62,7 +76,9 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   //~ removing password and refresh token from response
-  const createdUser = User.findById(user._id).select("-password -refreshToken");
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
 
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering the user!");
@@ -73,13 +89,13 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(200, createdUser, "User registered successfully!"));
 
-// 1️⃣ 2 status codes dene ka reason hai:
-// Ek actual HTTP response ke liye (res.status(201))
-// Ek structured response ke liye jo frontend easily handle kar sake (new ApiResponse(200, ...))
-//2️⃣ Is approach se API ka response clean, consistent aur easy-to-handle hota hai.
-//3️⃣ Agar error aata hai toh success: false set ho jata hai, jo frontend ko response handle karne me madad karta hai.
+  // 1️⃣ 2 status codes dene ka reason hai:
+  // Ek actual HTTP response ke liye (res.status(201))
+  // Ek structured response ke liye jo frontend easily handle kar sake (new ApiResponse(200, ...))
+  //2️⃣ Is approach se API ka response clean, consistent aur easy-to-handle hota hai.
+  //3️⃣ Agar error aata hai toh success: false set ho jata hai, jo frontend ko response handle karne me madad karta hai.
 
-//🚀 Yeh ek best practice hai jab aap scalable aur readable APIs bana rahe ho! 🔥
+  //🚀 Yeh ek best practice hai jab aap scalable aur readable APIs bana rahe ho!
 });
 
 export { registerUser };
