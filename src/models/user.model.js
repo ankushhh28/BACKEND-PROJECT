@@ -60,7 +60,7 @@ userSchema.pre("save", async function (next) {
 
   //* for the encrption of the password
   //* 10 → Salt rounds hai (jitna zyada, utna secure hashing)
-  this.password = bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
