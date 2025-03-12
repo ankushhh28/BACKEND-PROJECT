@@ -11,7 +11,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
       index: true,
-      /*Jab hum index: true kisi field me use karte hain Mongoose schema me, toh MongoDB us field pe ek index create kar deta hai.
+/*Jab hum index: true kisi field me use karte hain Mongoose schema me, toh MongoDB us field pe ek index create kar deta hai.
 👉 Indexing ka kaam hota hai queries ko fast banana, taaki database me efficiently searching ho sake.
 👉 Without Indexing, MongoDB har ek document ko scan karta hai, jo slow hota hai.
 👉 With Indexing, MongoDB directly indexed data pe search karta hai, jo bahut fast hota hai.*/
