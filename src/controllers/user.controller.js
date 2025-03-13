@@ -159,12 +159,18 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   //~ remove password and refreshToken field from loggedInUser
-  const loggedInUser =await User.findById(user._id).select(
+  const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
 
   //~ send cookie
-  const options = { httpOnly: true, secure: true };
+  const options = {
+    httpOnly: true,
+    //* Iska matlab hai ki ye cookie sirf server ke through access ho sakti hai, client-side JavaScript ise access nahi kar sakta.
+    secure: true,
+    //* Iska matlab hai ki ye cookie sirf encrypted (HTTPS) connections pe hi bheji jayegi.
+    //* HTTP ke upar nahi chalegi, jo security badhata hai.
+  };
 
   return res
     .status(200)
@@ -179,4 +185,28 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req, res) => {
+  //~ remove the tokens from DB
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: { refreshToken: undefined },
+    },
+    { new: true }
+    /* Jab aap findByIdAndUpdate() ka use karte ho, toh by default yeh function purana (update hone se pehle ka) document return karta hai.
+    Lekin agar aap { new: true } pass karte ho, toh yeh update hone ke baad ka naya document return karega.*/
+  );
+
+  //~ remove the data from the cookie
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged out successfully!"));
+});
+
+export { registerUser, loginUser, logoutUser };
